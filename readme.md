@@ -23,10 +23,6 @@ npm i -D gatsby-plugin-graphql-image
 `schemaName` - The typeName value of your graphql source from the gatsby-source-grapql plugin<br/>
 `imageFieldName` - The name of the field that contains your image URLs
 
-## When do I use this plugin?
-
-Include stories about when this plugin is helpful and/or necessary.
-
 ## Examples of usage
 
 ```js
