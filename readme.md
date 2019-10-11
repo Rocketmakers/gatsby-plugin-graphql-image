@@ -1,3 +1,5 @@
+# gatsby-plugin-graphql-image
+
 ## Description
 
 Traverses a grapqhl schema sourced from the [gatsby-source-graphql](https://www.gatsbyjs.org/packages/gatsby-source-graphql) plugin and generates file nodes for use with [gatsby-plugin-sharp](https://www.gatsbyjs.org/packages/gatsby-plugin-sharp) and [gatsby-transformer-sharp](https://www.gatsbyjs.org/packages/gatsby-transformer-sharp).
