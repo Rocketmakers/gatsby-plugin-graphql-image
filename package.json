@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "A gatsby plugin for generating file nodes from remote image URLS in GraphQL API's",
   "main": "gatsby-node.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rocketmakers/gatsby-plugin-graphql-image"
+  },
   "scripts": {
     "release": "ts-node _deploy/publish.ts"
   },
