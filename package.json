@@ -1,6 +1,6 @@
 {
   "name": "gatsby-plugin-graphql-image",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "A gatsby plugin for generating file nodes from remote image URLS in GraphQL API's",
   "main": "gatsby-node.js",
   "scripts": {
