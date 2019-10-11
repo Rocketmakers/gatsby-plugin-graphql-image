@@ -15,7 +15,7 @@ Traverses a grapqhl schema sourced from the [gatsby-source-graphql](https://www.
 ## How to install
 
 ```
-npm i -D gatsby-plugin-grapqhl-image
+npm i -D gatsby-plugin-graphql-image
 ```
 
 ## Available options
