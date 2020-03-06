@@ -20,8 +20,11 @@ npm i -D gatsby-plugin-graphql-image
 
 ## Available options
 
-`schemaName` - The typeName value of your graphql source from the gatsby-source-grapql plugin<br/>
-`imageFieldName` - The name of the field that contains your image URLs
+`images` - An array of objects with these options <br/>
+  - `schemaName` - The typeName value of your graphql source from the gatsby-source-grapql plugin <br/>
+  - `typeName` - The actual graphQL typeName (you can query `__typename` in GraphiQL to get the actual typeName)  <br/>
+  - `fieldName` - The name of the field that contains your image URLs <br/>
+  - `baseUrl` - (optional) A base url to use in case the values are not absolute paths
 
 ## Examples of usage
 
@@ -37,12 +40,15 @@ npm i -D gatsby-plugin-graphql-image
 {
   resolve: 'gatsby-plugin-graphql-image',
   options: {
-    schemaName: "ROCKETMAKERS",
-    imageFieldName: "imageUrl"
+    images: [
+      {
+        schemaName: 'ROCKETMAKERS',
+        typeName: 'ROCKETMAKERS_UploadFile',
+        fieldName: 'url',
+        baseUrl: 'https://rocketmakers.com',
+      },
+    ]
   }
 }
 ```
 
-## Limitations
-
-Currently only supports one imageFieldName. Would be nice for this to take an array instead :)
