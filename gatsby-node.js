@@ -1,30 +1,45 @@
-const { createRemoteFileNode } = require(`gatsby-source-filesystem`)
+const { createRemoteFileNode } = require(`gatsby-source-filesystem`);
 
 exports.createResolvers = ({
-  actions,
+  actions: { createNode },
   cache,
   createNodeId,
   createResolvers,
   store,
   reporter,
-}, configOptions) => {
-  const { createNode } = actions;
-
-  // Gatsby adds a configOption that's not needed for this plugin, delete it
-  delete configOptions.plugins;
-
-  //const imageUrlFieldName = "imageUrl";
-  const imageUrlFieldName = configOptions.imageFieldName;
-  //const schemaName = "MUMDANCE";
-  const schemaName = configOptions.schemaName;
-
+}, {
+  imageFieldName,
+  imageFieldType,
+  schemaName
+}) => {
   const state = store.getState();
-  const schema = state.schemaCustomization.thirdPartySchemas.filter(s => s._typeMap[schemaName])[0]
+  const schema = state.schemaCustomization.thirdPartySchemas.filter(s => s._typeMap[schemaName])[0];
 
   if (!schema){
     throw new Error(`SCHEMA '${schemaName} NOT FOUND'`)
   } else{
-    console.log(`Found schema '${schemaName}', traversing for fields with name '${imageUrlFieldName}'`)
+    const filters = [imageFieldName ? `name '${imageFieldName}'`: null, imageFieldType ? `type '${imageFieldType}'`: null].filter(x => x).join(' or ');
+    console.log(`Found schema '${schemaName}', traversing for fields with ${filters}`);
+  }
+
+  function shouldCreateNode(field) {
+    if ((typeof imageFieldName === `string`) && (field.name === imageFieldName)) {
+      return true;
+    }
+    if ((imageFieldName instanceof RegExp) && imageFieldName.test(field.name)) {
+      return true;
+    }
+
+    const fieldType = String(field.type).substring(schemaName.length + 1);
+
+    if ((typeof imageFieldType === `string`) && (fieldType === imageFieldType)) {
+      return true;
+    }
+    if ((imageFieldType instanceof RegExp) && imageFieldType.test(fieldType)) {
+      return true;
+    }
+
+    return false;
   }
 
   const typeMap = schema._typeMap;
@@ -37,11 +52,11 @@ exports.createResolvers = ({
     for (const fieldName in typeFields) {
       const field = typeFields[fieldName];
 
-      if (fieldName === imageUrlFieldName){
+      if (shouldCreateNode(field)){
         typeResolver[`${fieldName}Sharp`] = {
           type: 'File',
           resolve(source) {
-            const url = source[imageUrlFieldName];
+            const url = source[fieldName];
             if (url) {
               return createRemoteFileNode({
                 url,
