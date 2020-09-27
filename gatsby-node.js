@@ -22,6 +22,7 @@ exports.createResolvers = ({
     console.log(`Found schema '${schemaName}', traversing for fields with ${filters}`);
   }
 
+  const removeSchemaRE = new RegExp(`${schemaName}_`);
   function shouldCreateNode(field) {
     if ((typeof imageFieldName === `string`) && (field.name === imageFieldName)) {
       return true;
@@ -30,7 +31,7 @@ exports.createResolvers = ({
       return true;
     }
 
-    const fieldType = String(field.type).substring(schemaName.length + 1);
+    const fieldType = String(field.type).replace(removeSchemaRE, '');
 
     if ((typeof imageFieldType === `string`) && (fieldType === imageFieldType)) {
       return true;
