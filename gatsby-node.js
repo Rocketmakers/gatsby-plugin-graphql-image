@@ -1,47 +1,47 @@
-const { createRemoteFileNode } = require(`gatsby-source-filesystem`)
+const { createRemoteFileNode } = require(`gatsby-source-filesystem`);
 
-exports.createResolvers = ({
-  actions,
-  cache,
-  createNodeId,
-  createResolvers,
-  store,
-  reporter,
-}, configOptions) => {
+exports.createResolvers = (
+  { actions, cache, createNodeId, createResolvers, store, reporter },
+  configOptions
+) => {
   const { createNode } = actions;
 
   // Gatsby adds a configOption that's not needed for this plugin, delete it
   delete configOptions.plugins;
 
-  //const imageUrlFieldName = "imageUrl";
-  const imageUrlFieldName = configOptions.imageFieldName;
-  //const schemaName = "MUMDANCE";
-  const schemaName = configOptions.schemaName;
+  const { images } = configOptions;
 
   const state = store.getState();
-  const schema = state.schemaCustomization.thirdPartySchemas.filter(s => s._typeMap[schemaName])[0]
 
-  if (!schema){
-    throw new Error(`SCHEMA '${schemaName} NOT FOUND'`)
-  } else{
-    console.log(`Found schema '${schemaName}', traversing for fields with name '${imageUrlFieldName}'`)
-  }
-
-  const typeMap = schema._typeMap;
-  const resolvers = {};
-
-  for (const typeName in typeMap) {
+  for (let i = 0; i < images.length; ++i) {
+    const { schemaName, typeName, fieldName, baseUrl } = images[i];
+    const schema = state.schemaCustomization.thirdPartySchemas.filter(
+      s => s._typeMap[schemaName]
+    )[0];
+    if (!schema) {
+      console.warn(`Schema "${schemaName}" does not exist`);
+      continue;
+    }
+    const typeMap = schema._typeMap;
+    if (!typeMap[typeName]) {
+      console.warn(
+        `TypeName "${typeName}" does not exist in schema "${schemaName}"`
+      );
+      continue;
+    }
     const typeEntry = typeMap[typeName];
-    const typeFields = (typeEntry && typeEntry.getFields && typeEntry.getFields()) || {};
-    const typeResolver = {};
-    for (const fieldName in typeFields) {
-      const field = typeFields[fieldName];
-
-      if (fieldName === imageUrlFieldName){
-        typeResolver[`${fieldName}Sharp`] = {
-          type: 'File',
+    const typeFields =
+      (typeEntry && typeEntry.getFields && typeEntry.getFields()) || {};
+    if (!typeFields[fieldName]) {
+      console.warn(`Field "${fieldName}" does not exist on type ${typeName}`);
+      continue;
+    }
+    createResolvers({
+      [typeName]: {
+        [`${fieldName}Sharp`]: {
+          type: "File",
           resolve(source) {
-            const url = source[imageUrlFieldName];
+            const url = (baseUrl || "") + source[fieldName];
             if (url) {
               return createRemoteFileNode({
                 url,
@@ -49,20 +49,13 @@ exports.createResolvers = ({
                 cache,
                 createNode,
                 createNodeId,
-                reporter,
+                reporter
               });
             }
             return null;
-          },
-        };
+          }
+        }
       }
-    }
-    if (Object.keys(typeResolver).length) {
-      resolvers[typeName] = typeResolver;
-    }
+    });
   }
-
-  if (Object.keys(resolvers).length) {
-    createResolvers(resolvers);
-  }
-}
+};
